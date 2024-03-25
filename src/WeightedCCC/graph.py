@@ -1,14 +1,17 @@
+# -*- coding: utf-8 -*-
+""""module with GraphClosure class, used to apply the weighted CCC algorithm"""
+
 import math
 import copy
 import decimal
 import pandas as pd
 
-from graph_defaults import DefaultGraph
+from .defaults import DefaultGraph
 
 decimal.getcontext().rounding = "ROUND_HALF_UP"
 
 
-class Graph(DefaultGraph):
+class GraphClosure(DefaultGraph):
     def __init__(self, from_lig=None, to_lig=None, b_ddG=None, weights=None, filename=None):
         super().__init__(from_lig, to_lig, b_ddG, weights, filename)
 

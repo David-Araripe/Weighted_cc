@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""functions to calculate the ligand energies for a given set of nodes in a graph."""
+
 import sys
 import decimal
 import numpy as np

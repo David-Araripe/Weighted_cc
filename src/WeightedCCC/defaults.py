@@ -1,8 +1,16 @@
+# -*- coding: utf-8 -*-
+"""module with DefaultGraph class, the base class for the GraphClosure class."""
+
 from collections import defaultdict
 import decimal
 
 
-class DefaultGraph:
+class DefaultGraph:  # DefaultGraph -> GraphClosure
+    """Base class for the GraphClosure class. This class implementation contains operations
+    that involve reading and preparing the input data. For the cycle closure correction algorithm,
+    refer to the .graph.GraphClosure class
+    """
+
     def __init__(self, from_lig=None, to_lig=None, b_ddG=None, weights=None, filename=None):
         # Initialize graph attributes
         self.initialize_attributes()
