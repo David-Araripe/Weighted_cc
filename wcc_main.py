@@ -44,7 +44,7 @@ if __name__ == "__main__":
     # opts = optParser(fakeArgs.strip().split())  # only keep this for test purpose
     if not opts.option.file:
         raise Exception("No input energy data!")
-    g = Graph(opts.option.file)
+    g = Graph(filename=opts.option.file)
     g.getAllCyles()
     if len(g.cycles) == 0:
         print("No cycle in this graph.")
