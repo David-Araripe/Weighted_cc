@@ -1,70 +1,87 @@
-from optparse import OptionParser
-from Graphs import Graph
-import CalLig as lig
+# -*- coding: utf-8 -*-
+"""CLI implementation for the weighted-ccc package."""
+
+import argparse
+
+from .graph import GraphClosure
+from .calc_lig import (
+    cal_node_path_dependent_error,
+    cal_node_path_independent_error,
+    calcMolEnes,
+    getMolEnergyDataFrame,
+    set_node_map,
+)
 
 
 # if weights contained bennett_std, pleas display bennett_std before other weights
-class optParser:
-    def __init__(self, fakeArgs):
-        parser = OptionParser()
-        parser.add_option("-f", "--file", dest="file", help="Input file containing pairwise energy data")
-        parser.add_option(
-            "-r",
-            "--ref",
-            dest="ref",
-            help=(
-                "Reference molecule for calculating the energy for other molecules."
-                " Default: The first molecule in the data file"
-            ),
-            default="",
-        )
-        parser.add_option(
-            "-e",
-            "--ref_ene",
-            dest="ref_ene",
-            help="Energy for the reference molecule. Default: 0.00",
-            default=0.00,
-            type=float,
-        )
-        parser.add_option(
-            "-p",
-            "--print",
-            dest="print",
-            help=(
-                "Print option: no(Only print molecule energy), "
-                "yes(print pair-wise energy and molecule energy). Default: no"
-            ),
-            default="no",
-        )
-        if fakeArgs:
-            self.option, self.args = parser.parse_args(fakeArgs)
-        else:
-            self.option, self.args = parser.parse_args()
+def parse_arguments(fakeArgs=None):
+    parser = argparse.ArgumentParser(description="Process energy data for weighted CCC calculation.")
+
+    parser.add_argument("-f", "--file", dest="file", help="Input file containing pairwise energy data", required=True)
+    parser.add_argument(
+        "-r",
+        "--ref",
+        dest="ref",
+        default="",
+        help=(
+            "Reference molecule for calculating the energy for other molecules. "
+            "Default: The first molecule in the data file"
+        ),
+    )
+    parser.add_argument(
+        "-e",
+        "--ref_ene",
+        dest="ref_ene",
+        type=float,
+        default=0.00,
+        help="Energy for the reference molecule. Default: 0.00",
+    )
+    parser.add_argument(
+        "-p",
+        "--print",
+        dest="print",
+        choices=["no", "yes"],
+        default="no",
+        help=(
+            "Print option: no(Only print molecule energy), "
+            "yes(print pair-wise energy and molecule energy). Default: no"
+        ),
+    )
+
+    if fakeArgs:
+        return parser.parse_args(fakeArgs)
+    else:
+        return parser.parse_args()
 
 
-if __name__ == "__main__":
-    opts = optParser("")
+def main():
+    args = parse_arguments()
     # fakeArgs = "-f bace_run1_0_with_w -r 3A -e -8.83 -p yes"  # only keep this for test purpose
     # opts = optParser(fakeArgs.strip().split())  # only keep this for test purpose
-    if not opts.option.file:
+    args.print = args.print.lower()
+    if not args.file:
         raise Exception("No input energy data!")
-    g = Graph(filename=opts.option.file)
+    g = GraphClosure(filename=args.file)
     g.getAllCyles()
     if len(g.cycles) == 0:
         print("No cycle in this graph.")
         exit()
     g.iterateCycleClosure(minimum_cycles=2)
-    if opts.option.print == "yes":
+    if args.print == "yes":
         g.getEnergyPairsDataFrame(verbose=True)
-    node_map = lig.set_node_map(g)
-    if not opts.option.ref.strip():
-        opts.option.ref = g.V[0]
+    node_map = set_node_map(g)
+    if not args.ref.strip():
+        args.ref = g.V[0]
     try:
-        ref_node = g.V.index(opts.option.ref)
+        ref_node = g.V.index(args.ref)
     except ValueError as err:
-        print(f"Check your args. Ref {opts.option.ref} isn't in your input file! Error:\n{err}")
+        print(f"Check your args. Ref {args.ref} isn't in your input file! Error:\n{err}")
         raise ValueError from err
-    path_independent_error = lig.cal_node_path_independent_error(g.V, node_map)
-    path_dependent_error, path = lig.cal_node_path_dependent_error(ref_node, g.V, node_map)
-    mol_ene = lig.calcMolEnes(opts.option.ref_ene, g, path)
-    lig.getMolEnergyDataFrame(g.V, mol_ene, path_dependent_error, path_independent_error, verbose=True)
+    path_independent_error = cal_node_path_independent_error(g.V, node_map)
+    path_dependent_error, path = cal_node_path_dependent_error(ref_node, g.V, node_map)
+    mol_ene = calcMolEnes(args.ref_ene, g, path)
+    getMolEnergyDataFrame(g.V, mol_ene, path_dependent_error, path_independent_error, verbose=True)
+
+
+if __name__ == "__main__":
+    main()
