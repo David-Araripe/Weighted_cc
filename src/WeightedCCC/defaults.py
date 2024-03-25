@@ -16,7 +16,6 @@ class DefaultGraph:  # DefaultGraph -> GraphClosure
         self.initialize_attributes()
 
         if all([from_lig is not None, to_lig is not None, b_ddG is not None]):
-            print("omg")
             self.load_from_values(from_lig, to_lig, b_ddG, weights=weights)
 
         if filename is not None:
