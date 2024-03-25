@@ -1,0 +1,115 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weighted-ccc"
+dynamic = ["version"]
+description = "Weighted cycle closure correction implementation, as described in https://doi.org/10.1021/acs.jcim.2c01076"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+keywords = ["free energy perturbation", "alchemical free energy", "fep", "cycle closure correction"]
+authors = [{ name = "David Araripe", email = "david.araripe17@gmail.com" }]
+maintainers = [{ name = "David Araripe", email = "david.araripe17@gmail.com" }]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.9",
+  "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+dependencies = [
+  "matplotlib",
+]
+
+[project.optional-dependencies]
+full = [
+  "smallworld-api",
+  "papyrus_structure_pipeline",
+  "molvs",
+]
+dev = [
+  "pytest",
+  "ruff",
+  "isort",
+  "black",
+]
+
+[project.scripts]
+wccc = "WeightedCCC.wcc_cli:main"
+
+[project.urls]
+homepage = "https://github.com/David-Araripe/Weighted_cc"
+repository = "https://github.com/David-Araripe/Weighted_cc"
+# documentation = "https://readthedocs.org" TODO
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = { attr = "WeightedCCC.__version__" }
+
+[tool.setuptools_scm]
+write_to = "src/WeightedCCC/_version.py"
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 120
+target-version = ['py39']
+exclude = '''
+(
+    asv_bench/env
+  | \.egg
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.nox
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)
+'''
+
+[tool.ruff]
+# Enable the pycodestyle (`E`) and Pyflakes (`F`) rules.
+line-length = 120
+select = ["E", "F", "B", "W"]
+ignore = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Assume Python 3.9.
+target-version = "py39"
