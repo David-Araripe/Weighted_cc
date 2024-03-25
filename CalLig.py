@@ -1,6 +1,7 @@
 import sys
 import decimal
 import numpy as np
+import pandas as pd
 
 decimal.getcontext().rounding = "ROUND_HALF_UP"
 
@@ -35,13 +36,13 @@ def cal_node_path_dependent_error(source, node, node_map):
     for i in range(1, vertex_num):
         min_cost = sys.maxsize
         for j in range(vertex_num):
-            if visited[j] == False and dist[j] < min_cost:
+            if visited[j] is False and dist[j] < min_cost:
                 min_cost_index = j
                 min_cost = dist[j]
         visited[min_cost_index] = True
         for j in range(vertex_num):
             if (
-                visited[j] == False
+                visited[j] is False
                 and node_map[min_cost_index][j] != sys.maxsize
                 and min_cost + node_map[min_cost_index][j] < dist[j]
             ):
@@ -75,17 +76,26 @@ def calcMolEnes(ref_ene, graph, path):
     return mol_ene
 
 
-def printMol(nodes, mol_ene, path_dependent_error, path_independent_error):
-    print("{:^4s} {:^12s}".format("Node", "dG_cc"), end="")
-    for k in range(1, len(mol_ene)):
-        print(" {:^12s}".format("dG_wcc" + str(k)), end="")
-    print(" {:^25s} {:^25s}".format("path_dependent_error", "path_independent_error"))
+def getMolEnergyDataFrame(nodes, mol_ene, path_dependent_error, path_independent_error, verbose=False):
+    # Initialize the columns for the DataFrame
+    columns = (
+        ["Node", "dG_cc"]
+        + [f"dG_wcc{k}" for k in range(0, len(mol_ene))]
+        + ["path_dependent_error", "path_independent_error"]
+    )
+    data = []
+
+    # Populate the data list with rows of values for each node
     for i in range(len(nodes)):
-        print("{:^4s} {:^12.4f}".format(nodes[i], mol_ene[0][i]), end="")
-        for k in range(1, len(mol_ene)):
-            print(" {:^12.4f}".format(mol_ene[k][i]), end="")
-        print(
-            " {:^25.4f} {:^25.4f}".format(
-                path_dependent_error[i].sqrt().quantize(decimal.Decimal("0.00")), path_independent_error[i]
-            )
-        )
+        row = [nodes[i], mol_ene[0][i]]
+        row += [mol_ene[k][i] for k in range(0, len(mol_ene))]
+        row.append(path_dependent_error[i].sqrt().quantize(decimal.Decimal("0.00")))
+        row.append(path_independent_error[i])
+        data.append(row)
+
+    # Create the DataFrame
+    df = pd.DataFrame(data, columns=columns)
+    if verbose:
+        print(df)
+
+    return df

@@ -1,6 +1,7 @@
 import math
 import copy
 import decimal
+import pandas as pd
 
 from graph_defaults import DefaultGraph
 
@@ -100,24 +101,20 @@ class Graph(DefaultGraph):
         for molpair in self.print_e:
             self.nodelist.append([molpair[0], molpair[1], self.err[molpair]])
 
-    def printEnePairs(self):
+    def getEnergyPairsDataFrame(self, verbose=False):
+        # Initialize columns for the DataFrame
+        columns = ["Pair"] + [f"ddG_wcc{k}" for k in range(0, self.weight_num)] + ["pair_error"]
+        data = []
 
-        print("Printing Pairwise Energies:")
-        print("{:8s} {:10s}".format("Pair", "ddG_cc"), end="")
-        for k in range(1, self.weight_num):
-            print(" {:^10s}".format("ddG_wcc" + str(k)), end="")
-        print(" {:^10s}".format("pair_error"))
+        # Populate the data list with rows of values for each molecular pair
         for molpair in self.print_e:
-            print(
-                "{:>2s}-{:2s}{:^14.4f}".format(
-                    molpair[0],
-                    molpair[1],
-                    self.ddG_cc[molpair][0],
-                ),
-                end="",
-            )
-            for k in range(1, self.weight_num):
-                print(" {:^10.4f}".format(self.ddG_cc[molpair][k]), end="")
-            print("{:^10.4f}".format(self.err[molpair].quantize(decimal.Decimal("0.00"))))
-            # self.nodelist.append([molpair[0], molpair[1], self.err[molpair]])
-        print("*" * 100)
+            row = [f"{molpair[0]}-{molpair[1]}"]
+            row += [self.ddG_cc[molpair][k] for k in range(0, self.weight_num)]
+            row.append(self.err[molpair].quantize(decimal.Decimal("0.00")))
+            data.append(row)
+
+        # Create the DataFrame
+        df = pd.DataFrame(data, columns=columns)
+        if verbose:
+            print(df)
+        return df

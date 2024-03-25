@@ -12,7 +12,10 @@ class optParser:
             "-r",
             "--ref",
             dest="ref",
-            help="Reference molecule for calculating the energy for other molecules. Default: The first molecule in the data file",
+            help=(
+                "Reference molecule for calculating the energy for other molecules."
+                " Default: The first molecule in the data file"
+            ),
             default="",
         )
         parser.add_option(
@@ -23,13 +26,14 @@ class optParser:
             default=0.00,
             type=float,
         )
-        # parser.add_option('-w', '--weight', dest='weight', help='Weight option: no(original cycle closure), bar(if weights contained bennett_std). Default: 0',
-        #                   default="no")
         parser.add_option(
             "-p",
             "--print",
             dest="print",
-            help="Print option: no(Only print molecule energy), yes(print pair-wise energy and molecule energy). Default: no",
+            help=(
+                "Print option: no(Only print molecule energy), "
+                "yes(print pair-wise energy and molecule energy). Default: no"
+            ),
             default="no",
         )
         if fakeArgs:
@@ -51,16 +55,16 @@ if __name__ == "__main__":
         exit()
     g.iterateCycleClosure(minimum_cycles=2)
     if opts.option.print == "yes":
-        g.printEnePairs()
+        g.getEnergyPairsDataFrame(verbose=True)
     node_map = lig.set_node_map(g)
     if not opts.option.ref.strip():
         opts.option.ref = g.V[0]
     try:
         ref_node = g.V.index(opts.option.ref)
-    except ValueError as e:
-        print("Check your args. Ref", opts.option.ref, "isn't in your input file!")
-        exit()
+    except ValueError as err:
+        print(f"Check your args. Ref {opts.option.ref} isn't in your input file! Error:\n{err}")
+        raise ValueError from err
     path_independent_error = lig.cal_node_path_independent_error(g.V, node_map)
     path_dependent_error, path = lig.cal_node_path_dependent_error(ref_node, g.V, node_map)
     mol_ene = lig.calcMolEnes(opts.option.ref_ene, g, path)
-    lig.printMol(g.V, mol_ene, path_dependent_error, path_independent_error)
+    lig.getMolEnergyDataFrame(g.V, mol_ene, path_dependent_error, path_independent_error, verbose=True)
