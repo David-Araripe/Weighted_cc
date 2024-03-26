@@ -105,19 +105,19 @@ class GraphClosure(DefaultGraph):
             self.nodelist.append([molpair[0], molpair[1], self.err[molpair]])
 
     def getEnergyPairsDataFrame(self, verbose=False):
-        # Initialize columns for the DataFrame
-        columns = ["Pair"] + [f"ddG_wcc{k}" for k in range(0, self.weight_num)] + ["pair_error"]
+        value_cols = [f"ddG_wcc{k}" for k in range(0, self.weight_num)] + ["pair_error"]
+        columns = ["Pair"] + value_cols
         data = []
 
-        # Populate the data list with rows of values for each molecular pair
-        for molpair in self.print_e:
+        for molpair in self.print_e:  # rows of values for each molecular pair
             row = [f"{molpair[0]}-{molpair[1]}"]
             row += [self.ddG_cc[molpair][k] for k in range(0, self.weight_num)]
             row.append(self.err[molpair].quantize(decimal.Decimal("0.00")))
             data.append(row)
 
-        # Create the DataFrame
         df = pd.DataFrame(data, columns=columns)
+        for col in value_cols:
+            df[col] = df[col].astype(float)  # convert back to float dtypes
         if verbose:
             print(df)
         return df

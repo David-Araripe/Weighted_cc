@@ -75,21 +75,16 @@ def calcMolEnes(ref_ene, graph, path):
             for i in range(len(route_mol_list) - 1):
                 curr_path = (graph.V[route_mol_list[i]], graph.V[route_mol_list[i + 1]])
                 curr_ene = graph.ddG_cc[curr_path][k]
-                mol_ene[k][m] -= float(curr_ene)  ###
+                mol_ene[k][m] -= float(curr_ene)
     return mol_ene
 
 
 def getMolEnergyDataFrame(nodes, mol_ene, path_dependent_error, path_independent_error, verbose=False):
-    # Initialize the columns for the DataFrame
-    columns = (
-        ["Node", "dG_cc"]
-        + [f"dG_wcc{k}" for k in range(0, len(mol_ene))]
-        + ["path_dependent_error", "path_independent_error"]
-    )
+    value_cols = [f"dG_wcc{k}" for k in range(0, len(mol_ene))] + ["path_dependent_error", "path_independent_error"]
+    columns = ["Node", "dG_cc"] + value_cols
     data = []
 
-    # Populate the data list with rows of values for each node
-    for i in range(len(nodes)):
+    for i in range(len(nodes)):  # rows of values for each molecular pair
         row = [nodes[i], mol_ene[0][i]]
         row += [mol_ene[k][i] for k in range(0, len(mol_ene))]
         row.append(path_dependent_error[i].sqrt().quantize(decimal.Decimal("0.00")))
@@ -98,7 +93,8 @@ def getMolEnergyDataFrame(nodes, mol_ene, path_dependent_error, path_independent
 
     # Create the DataFrame
     df = pd.DataFrame(data, columns=columns)
+    for col in value_cols:
+        df[col] = df[col].astype(float)
     if verbose:
         print(df)
-
     return df
