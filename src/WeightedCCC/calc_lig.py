@@ -28,14 +28,15 @@ def cal_node_path_independent_error(node, node_map):
 
 
 def cal_node_path_dependent_error(source, node, node_map):
+    source_index = node.index(source)
     vertex_num = len(node)
     visited = [False for i in range(vertex_num)]
-    visited[source] = True
+    visited[source_index] = True
     dist = [0 for i in range(vertex_num)]
     pre = [0 for i in range(vertex_num)]
     for i in range(len(node)):
-        dist[i] = node_map[source][i]
-        pre[i] = source
+        dist[i] = node_map[source_index][i]
+        pre[i] = source_index
     for i in range(1, vertex_num):
         min_cost = sys.maxsize
         for j in range(vertex_num):
@@ -56,10 +57,10 @@ def cal_node_path_dependent_error(source, node, node_map):
     for i in range(0, vertex_num):
         path = []
         path.append(i)
-        if i != source:
+        if i != source_index:
             t = pre[i]
             path.append(t)
-            while t != source:
+            while t != source_index:
                 t = pre[t]
                 path.append(t)
         path_all.append(path)
