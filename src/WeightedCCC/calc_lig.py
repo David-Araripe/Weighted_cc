@@ -88,7 +88,7 @@ def getMolEnergyDataFrame(nodes, mol_ene, path_dependent_error, path_independent
         row = [nodes[i], mol_ene[0][i]]
         row += [mol_ene[k][i] for k in range(0, len(mol_ene))]
         row.append(path_dependent_error[i].sqrt().quantize(decimal.Decimal("0.00")))
-        row.append(path_independent_error[i])
+        row.append(path_independent_error[i].sqrt().quantize(decimal.Decimal("0.00")))
         data.append(row)
 
     # Create the DataFrame

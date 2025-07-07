@@ -5,6 +5,9 @@
 
 ⚠️ Note ⚠️ that this is a fork of the original repo. For the original repo please visit https://github.com/zlisysu/Weighted_cc
 
+We further propose a new free energy correction algorithm: [State Function-Based Correction (SFC)](https://github.com/ZheLi-Lab/State-Function-based-free-energy-correction-SFC-), which does not rely on explicit graph identification and is theoretically more computationally efficient than WCC. For small-scale molecular perturbation networks, the computational cost of WCC and SFC is similar; however, for large-scale molecular networks, we recommend using SFC, as it provides all the equivalent functionalities of WCC, including cycle closure correction that accounts for free energy uncertainties and path-independent error estimation.
+
+
 Please ensure that your input file contains at least three columns: The first two columns are the names of the mutation ligands, and the third colunm are their pair-wise energy. 
 
 # Installation:

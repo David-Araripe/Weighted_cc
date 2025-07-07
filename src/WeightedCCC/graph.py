@@ -112,7 +112,7 @@ class GraphClosure(DefaultGraph):
         for molpair in self.print_e:  # rows of values for each molecular pair
             row = [f"{molpair[0]}-{molpair[1]}"]
             row += [self.ddG_cc[molpair][k] for k in range(0, self.weight_num)]
-            row.append(self.err[molpair].quantize(decimal.Decimal("0.00")))
+            row.append(decimal.Decimal(self.err[molpair]).quantize(decimal.Decimal("0.00")))
             data.append(row)
 
         df = pd.DataFrame(data, columns=columns)
